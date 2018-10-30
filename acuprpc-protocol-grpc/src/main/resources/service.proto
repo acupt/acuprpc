@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.acupt.acuprpc.protocol.grpc.proto";
+option java_outer_classname = "GrpcServiceProto";
+
+package com.acupt.acuprpc.protocol.grpc.proto;
+
+service GrpcService {
+    /**
+    * 通用jsonRPC请求的GRpc接口
+    */
+    rpc invokeMethod (InvokeRequest) returns (InvokeResponse) {
+    }
+}
+
+message InvokeRequest {
+    string serviceName = 1;
+    string methodName = 2;
+    repeated string orderedParameter = 3;
+}
+
+message InvokeResponse {
+    int32 code = 1;
+    string message = 2;
+    string result = 3;
+}
