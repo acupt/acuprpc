@@ -1,6 +1,7 @@
 package com.acupt.acuprpc.spring;
 
-import com.acupt.acuprpc.core.RpcConf;
+import com.acupt.acuprpc.core.RpcInstance;
+import com.acupt.acuprpc.core.conf.RpcConf;
 import com.acupt.acuprpc.protocol.grpc.GrpcServer;
 import com.acupt.acuprpc.server.RpcServer;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +19,23 @@ public class RpcConfiguration {
     }
 
     @Bean
-    public RpcServer rpcServer(RpcConf rpcConf) {
-        return new GrpcServer(rpcConf);
+    public RpcInstance rpcInstance(RpcConf rpcConf) {
+        return new RpcInstance(rpcConf);
+    }
+
+    @Bean
+    public RpcServer rpcServer(RpcInstance rpcInstance) {
+        return new GrpcServer(rpcInstance);
+    }
+
+    @Bean
+    public RpcServiceManager rpcServiceManager(RpcInstance rpcInstance) {
+        return new RpcServiceManager(rpcInstance);
+    }
+
+    @Bean
+    public RpcServiceConsumer rpcServiceConsumer(RpcServiceManager rpcServiceManager) {
+        return new RpcServiceConsumer(rpcServiceManager);
     }
 
     @Bean

@@ -22,11 +22,12 @@ public class GrpcService extends GrpcServiceGrpc.GrpcServiceImplBase {
     @Override
     public void invokeMethod(InvokeRequest request, StreamObserver<InvokeResponse> responseObserver) {
         RpcRequest rpcRequest = new RpcRequest(
+                request.getAppName(),
                 request.getServiceName(),
                 request.getMethodName(),
                 request.getOrderedParameterList());
-        RpcResponse rpcResponse = null;
-        InvokeResponse response = null;
+        RpcResponse rpcResponse;
+        InvokeResponse response;
         try {
             rpcResponse = rpcServer.execute(rpcRequest);
             response = InvokeResponse.newBuilder()

@@ -1,6 +1,6 @@
 package com.acupt.acuprpc.protocol.grpc;
 
-import com.acupt.acuprpc.core.RpcConf;
+import com.acupt.acuprpc.core.RpcInstance;
 import com.acupt.acuprpc.server.RpcServer;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -13,14 +13,15 @@ public class GrpcServer extends RpcServer {
 
     private Server server;
 
-    public GrpcServer(RpcConf rpcConf) {
-        super(rpcConf);
+    public GrpcServer(RpcInstance rpcInstance) {
+        super(rpcInstance);
     }
+
 
     @SneakyThrows
     protected void startRpc() {
         server = ServerBuilder
-                .forPort(getRpcConf().getPort())
+                .forPort(getRpcInstance().getRpcConf().getPort())
                 .addService(new GrpcService(this))
                 .build().start();
     }

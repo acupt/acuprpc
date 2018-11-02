@@ -19,6 +19,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring.version>4.3.9.RELEASE</spring.version>
         <spring.boot.version>1.5.4.RELEASE</spring.boot.version>
+        <eureka.version>1.7.0</eureka.version>
     </properties>
     <dependencies>
         <dependency>
@@ -41,5 +42,26 @@
             <artifactId>spring-boot-starter</artifactId>
             <version>${spring.boot.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.netflix.eureka</groupId>
+            <artifactId>eureka-client</artifactId>
+            <version>${eureka.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>com.google.guava</groupId>-->
+        <!--<artifactId>guava</artifactId>-->
+        <!--<version>19.0</version>-->
+        <!--</dependency>-->
     </dependencies>
 </project>

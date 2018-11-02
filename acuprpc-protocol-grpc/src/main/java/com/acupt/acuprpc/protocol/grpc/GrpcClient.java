@@ -22,16 +22,15 @@ public class GrpcClient extends RpcClient {
 
     private AtomicReference<GrpcServiceGrpc.GrpcServiceBlockingStub> stubRef;
 
-    private NodeInfo nodeInfo;
-
     public GrpcClient(NodeInfo nodeInfo) {
-        this.nodeInfo = nodeInfo;
+        super(nodeInfo);
         this.stubRef = new AtomicReference<>(getStub(nodeInfo));
     }
 
     @Override
     protected String remoteInvoke(RpcRequest rpcRequest) {
         InvokeRequest.Builder builder = InvokeRequest.newBuilder()
+                .setAppName(rpcRequest.getAppName())
                 .setServiceName(rpcRequest.getServiceName())
                 .setMethodName(rpcRequest.getMethodName());
         if (rpcRequest.getOrderedParameter() != null && !rpcRequest.getOrderedParameter().isEmpty()) {
@@ -46,7 +45,7 @@ public class GrpcClient extends RpcClient {
 
     @Override
     @SneakyThrows
-    public void shutdown() {
+    public void shutdownRpc() {
         GrpcServiceGrpc.GrpcServiceBlockingStub stub = stubRef.get();
         if (stub == null) {
             return;

@@ -1,6 +1,6 @@
 package com.acupt.acuprpc.spring;
 
-import com.acupt.acuprpc.core.RpcConf;
+import com.acupt.acuprpc.core.conf.RpcConf;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;

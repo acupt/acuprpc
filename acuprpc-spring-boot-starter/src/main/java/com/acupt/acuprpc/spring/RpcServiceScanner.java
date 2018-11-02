@@ -53,7 +53,8 @@ public class RpcServiceScanner implements BeanPostProcessor {
         }
         for (Class<?> serviceInterface : interfaces) {
             rpcServer.registerService(
-                    new RpcServiceInfo(serviceInterface.getCanonicalName()),
+                    new RpcServiceInfo(rpcServer.getRpcInstance().getRpcConf().getAppName(),
+                            serviceInterface.getCanonicalName()),
                     bean,
                     serviceInterface,
                     methodInfoMap);

@@ -1,10 +1,7 @@
 package com.acupt.acuprpc.core;
 
-import lombok.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  * @author liujie
@@ -12,5 +9,6 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class RpcServiceInfo {
+    private String appName;
     private String serviceName;
 }

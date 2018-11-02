@@ -15,9 +15,10 @@ service GrpcService {
 }
 
 message InvokeRequest {
-    string serviceName = 1;
-    string methodName = 2;
-    repeated string orderedParameter = 3;
+    string appName = 1;
+    string serviceName = 2;
+    string methodName = 3;
+    repeated string orderedParameter = 4;
 }
 
 message InvokeResponse {

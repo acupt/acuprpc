@@ -17,12 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public abstract class RpcServer {
 
-    private RpcConf rpcConf;
-
     private Map<RpcServiceInfo, ServiceExecutor> serviceExecutorMap = new ConcurrentHashMap<>();
 
-    public RpcServer(RpcConf rpcConf) {
-        this.rpcConf = rpcConf;
+    private RpcInstance rpcInstance;
+
+    public RpcServer(RpcInstance rpcInstance) {
+        this.rpcInstance = rpcInstance;
     }
 
     protected abstract void startRpc();
@@ -32,21 +32,25 @@ public abstract class RpcServer {
     @PostConstruct
     public void start() {
         log.info(getClass().getSimpleName() + " starting");
+        rpcInstance.start();
         startRpc();
     }
 
     @PreDestroy
     public void shutdown() {
+        rpcInstance.shutdown();
         shutdownRpc();
         log.info(getClass().getSimpleName() + " shutdown");
     }
 
     public void started() {
+        rpcInstance.started();
         log.info(getClass().getSimpleName() + " started");
     }
 
     public RpcResponse execute(RpcRequest rpcRequest) {
-        ServiceExecutor executor = serviceExecutorMap.get(new RpcServiceInfo(rpcRequest.getServiceName()));
+        ServiceExecutor executor = serviceExecutorMap.get(new RpcServiceInfo(rpcRequest.getAppName(),
+                rpcRequest.getServiceName()));
         if (executor == null) {
             return new RpcResponse(404, "service not found");
         }
