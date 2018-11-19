@@ -45,6 +45,20 @@ public class GrpcClient extends RpcClient {
 
     @Override
     @SneakyThrows
+    protected NodeInfo reconnectRpc(NodeInfo nodeInfo) {
+        GrpcServiceGrpc.GrpcServiceBlockingStub old =
+                stubRef.getAndUpdate(s -> getStub(nodeInfo));
+        if (old != null) {
+            ((ManagedChannel) old.getChannel()).shutdown()
+                    .awaitTermination(5, TimeUnit.SECONDS);
+        }
+        NodeInfo oldNode = getNodeInfo();
+        setNodeInfo(nodeInfo);
+        return oldNode;
+    }
+
+    @Override
+    @SneakyThrows
     public void shutdownRpc() {
         GrpcServiceGrpc.GrpcServiceBlockingStub stub = stubRef.get();
         if (stub == null) {

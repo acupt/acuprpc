@@ -31,9 +31,18 @@ public abstract class RpcClient {
      */
     protected abstract String remoteInvoke(RpcRequest rpcRequest);
 
+    /**
+     * 重新连接远程服务
+     */
+    protected abstract NodeInfo reconnectRpc(NodeInfo nodeInfo);
+
     @PreDestroy
     public void shutdown() {
         shutdownRpc();
+    }
+
+    public NodeInfo reconnect(NodeInfo nodeInfo) {
+        return reconnectRpc(nodeInfo);
     }
 
     public Object invoke(RpcMethodInfo methodInfo, Object[] parameters) {
@@ -44,7 +53,16 @@ public abstract class RpcClient {
         if (parameters != null && parameters.length > 0) {
             request.setOrderedParameter(Arrays.stream(parameters).map(JsonUtil::toJson).collect(Collectors.toList()));
         }
+        //todo 维护多个连接，访问到下线节点时自动重试其他节点
         String res = remoteInvoke(request);
         return JsonUtil.fromJson(res, TypeFactory.defaultInstance().constructType(methodInfo.getReturnType()));
+    }
+
+    public NodeInfo getNodeInfo() {
+        return nodeInfo;
+    }
+
+    protected void setNodeInfo(NodeInfo nodeInfo) {
+        this.nodeInfo = nodeInfo;
     }
 }
