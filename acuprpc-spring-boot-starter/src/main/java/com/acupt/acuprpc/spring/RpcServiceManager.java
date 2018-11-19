@@ -5,6 +5,7 @@ import com.acupt.acuprpc.core.NodeInfo;
 import com.acupt.acuprpc.core.RpcInstance;
 import com.acupt.acuprpc.core.RpcServiceInfo;
 import com.acupt.acuprpc.exception.RpcException;
+import com.acupt.acuprpc.exception.RpcNotFoundException;
 import com.acupt.acuprpc.protocol.grpc.GrpcClient;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.shared.Application;
@@ -34,6 +35,7 @@ public class RpcServiceManager {
             while (true) {
                 try {
                     relookup();
+                    log.info("rpc relookup finish");
                 } catch (Exception e) {
                     log.error("rpc relookup error " + e.getMessage(), e);
                 }
@@ -48,38 +50,38 @@ public class RpcServiceManager {
 
     public RpcClient lookup(RpcServiceInfo rpcServiceInfo) {
         return rpcClientMap.computeIfAbsent(rpcServiceInfo, k -> {
-            Application application = rpcInstance.getEurekaClient().getApplication(k.getAppName());
-            if (application == null) {
-                throw new RpcException(String.format("service[%s] not found", k.getAppName()));
+            try {
+                return new GrpcClient(selectNode(rpcServiceInfo));
+            } catch (RpcNotFoundException e) {
+                throw new RpcException(e);
             }
-            List<InstanceInfo> list = application.getInstances();
-            if (CollectionUtils.isEmpty(list)) {
-                throw new RpcException(String.format("service[%s] found no instance", k.getAppName()));
-            }
-            InstanceInfo instanceInfo = list.get(random.nextInt(list.size()));
-            NodeInfo nodeInfo = new NodeInfo(instanceInfo.getIPAddr(), instanceInfo.getPort());
-            return new GrpcClient(nodeInfo);
         });
     }
 
     private void relookup() {
         rpcClientMap.forEach((serviceInfo, client) -> {
-            Application application = rpcInstance.getEurekaClient().getApplication(serviceInfo.getAppName());
-            if (application == null) {
-                log.error("service[{}] not found", serviceInfo.getAppName());
-                return;
-            }
-            List<InstanceInfo> list = application.getInstances();
-            if (CollectionUtils.isEmpty(list)) {
-                log.error("service[{}] found no instance", serviceInfo.getAppName());
-                return;
-            }
-            InstanceInfo instanceInfo = list.get(random.nextInt(list.size()));
-            NodeInfo nodeInfo = new NodeInfo(instanceInfo.getIPAddr(), instanceInfo.getPort());
-            if (!nodeInfo.equals(client.getNodeInfo())) {
-                NodeInfo oldNodeInfo = client.reconnect(nodeInfo);
-                log.info("reconnet {} {} -> {}", serviceInfo, oldNodeInfo, nodeInfo);
+            try {
+                NodeInfo nodeInfo = selectNode(serviceInfo);
+                if (!nodeInfo.equals(client.getNodeInfo())) {
+                    NodeInfo oldNodeInfo = client.reconnect(nodeInfo);
+                    log.info("reconnet {} {} -> {}", serviceInfo, oldNodeInfo, nodeInfo);
+                }
+            } catch (RpcNotFoundException e) {
+                e.printStackTrace();
             }
         });
+    }
+
+    public NodeInfo selectNode(RpcServiceInfo serviceInfo) throws RpcNotFoundException {
+        Application application = rpcInstance.getEurekaClient().getApplication(serviceInfo.getAppName());
+        if (application == null) {
+            throw new RpcNotFoundException(String.format("service[%s] not found", serviceInfo.getAppName()));
+        }
+        List<InstanceInfo> list = application.getInstances();
+        if (CollectionUtils.isEmpty(list)) {
+            throw new RpcNotFoundException(String.format("service[%s] found no instance", serviceInfo.getAppName()));
+        }
+        InstanceInfo instanceInfo = list.get(random.nextInt(list.size()));
+        return new NodeInfo(instanceInfo.getIPAddr(), instanceInfo.getPort());
     }
 }

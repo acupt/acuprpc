@@ -5,6 +5,7 @@ import com.acupt.acuprpc.core.RpcMethodInfo;
 import com.acupt.acuprpc.core.RpcRequest;
 import com.acupt.acuprpc.util.JsonUtil;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PreDestroy;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 /**
  * @author liujie
  */
+@Slf4j
 public abstract class RpcClient {
 
     private NodeInfo nodeInfo;
@@ -20,11 +22,6 @@ public abstract class RpcClient {
     public RpcClient(NodeInfo nodeInfo) {
         this.nodeInfo = nodeInfo;
     }
-
-    /**
-     * 关闭连接
-     */
-    public abstract void shutdownRpc();
 
     /**
      * 远程调用
@@ -36,8 +33,14 @@ public abstract class RpcClient {
      */
     protected abstract NodeInfo reconnectRpc(NodeInfo nodeInfo);
 
+    /**
+     * 关闭连接
+     */
+    public abstract void shutdownRpc();
+
     @PreDestroy
     public void shutdown() {
+        log.info("shutting down {}", this);
         shutdownRpc();
     }
 
@@ -53,7 +56,6 @@ public abstract class RpcClient {
         if (parameters != null && parameters.length > 0) {
             request.setOrderedParameter(Arrays.stream(parameters).map(JsonUtil::toJson).collect(Collectors.toList()));
         }
-        //todo 维护多个连接，访问到下线节点时自动重试其他节点
         String res = remoteInvoke(request);
         return JsonUtil.fromJson(res, TypeFactory.defaultInstance().constructType(methodInfo.getReturnType()));
     }

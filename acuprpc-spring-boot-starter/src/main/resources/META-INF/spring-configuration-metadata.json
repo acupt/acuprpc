@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "acuprpc.port",
+      "type": "java.lang.Integer",
+      "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
+    },
+    {
+      "name": "acuprpc.appName",
+      "type": "java.lang.String",
+      "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
+    },
+    {
+      "name": "acuprpc.appGroup",
+      "type": "java.lang.String",
+      "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
+    },
+    {
+      "name": "acuprpc.discoveryServiceUrl",
+      "type": "java.lang.String",
+      "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
+    },
+    {
+      "name": "acuprpc.registerWithDiscovery",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
+    }
+  ]
+}
