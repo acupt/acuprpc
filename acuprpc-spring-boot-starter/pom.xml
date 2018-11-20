@@ -38,5 +38,10 @@
             <artifactId>acuprpc-protocol-grpc</artifactId>
             <version>${parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.acupt</groupId>
+            <artifactId>acuprpc-protocol-thrift</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
     </dependencies>
 </project>

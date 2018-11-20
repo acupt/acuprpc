@@ -1,8 +1,10 @@
 package com.acupt.acuprpc.core;
 
+import com.acupt.acuprpc.client.RpcClient;
 import com.acupt.acuprpc.core.conf.RpcConf;
 import com.acupt.acuprpc.core.conf.RpcEurekaClientConfig;
 import com.acupt.acuprpc.core.conf.RpcEurekaInstanceConfig;
+import com.acupt.acuprpc.server.RpcServer;
 import com.acupt.acuprpc.util.IpUtil;
 import com.netflix.appinfo.ApplicationInfoManager;
 import com.netflix.appinfo.InstanceInfo;
@@ -10,6 +12,8 @@ import com.netflix.appinfo.providers.EurekaConfigBasedInstanceInfoProvider;
 import com.netflix.discovery.DiscoveryClient;
 import com.netflix.discovery.EurekaClient;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 在服务中心注册的实例
@@ -17,6 +21,7 @@ import lombok.Getter;
  * @author liujie
  */
 @Getter
+@Slf4j
 public class RpcInstance {
 
     private EurekaClient eurekaClient;
@@ -42,6 +47,8 @@ public class RpcInstance {
         this.applicationInfoManager = new ApplicationInfoManager(instanceConfig, instanceInfo);
         this.eurekaClient = new DiscoveryClient(applicationInfoManager, clientConfig);
         this.rpcConf = rpcConf;
+        log.info("protocol server -> " + rpcConf.getRpcServerClass());
+        log.info("protocol client -> " + rpcConf.getRpcClientClass());
     }
 
     public void start() {
@@ -55,5 +62,15 @@ public class RpcInstance {
     public void shutdown() {
         applicationInfoManager.setInstanceStatus(InstanceInfo.InstanceStatus.DOWN);
         eurekaClient.shutdown();
+    }
+
+    @SneakyThrows
+    public RpcServer newRpcServer() {
+        return rpcConf.getRpcServerClass().getConstructor(RpcInstance.class).newInstance(this);
+    }
+
+    @SneakyThrows
+    public RpcClient newRpcClient(NodeInfo nodeInfo) {
+        return rpcConf.getRpcClientClass().getConstructor(NodeInfo.class).newInstance(nodeInfo);
     }
 }

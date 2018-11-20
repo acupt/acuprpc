@@ -6,7 +6,6 @@ import com.acupt.acuprpc.core.RpcInstance;
 import com.acupt.acuprpc.core.RpcServiceInfo;
 import com.acupt.acuprpc.exception.RpcException;
 import com.acupt.acuprpc.exception.RpcNotFoundException;
-import com.acupt.acuprpc.protocol.grpc.GrpcClient;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.shared.Application;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class RpcServiceManager {
     public RpcClient lookup(RpcServiceInfo rpcServiceInfo) {
         return rpcClientMap.computeIfAbsent(rpcServiceInfo, k -> {
             try {
-                return new GrpcClient(selectNode(rpcServiceInfo));
+                return rpcInstance.newRpcClient(selectNode(rpcServiceInfo));
             } catch (RpcNotFoundException e) {
                 throw new RpcException(e);
             }

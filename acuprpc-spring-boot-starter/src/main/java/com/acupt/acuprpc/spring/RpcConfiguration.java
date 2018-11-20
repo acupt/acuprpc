@@ -2,8 +2,8 @@ package com.acupt.acuprpc.spring;
 
 import com.acupt.acuprpc.core.RpcInstance;
 import com.acupt.acuprpc.core.conf.RpcConf;
-import com.acupt.acuprpc.protocol.grpc.GrpcServer;
 import com.acupt.acuprpc.server.RpcServer;
+import lombok.SneakyThrows;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,8 +24,9 @@ public class RpcConfiguration {
     }
 
     @Bean
+    @SneakyThrows
     public RpcServer rpcServer(RpcInstance rpcInstance) {
-        return new GrpcServer(rpcInstance);
+        return rpcInstance.newRpcServer();
     }
 
     @Bean

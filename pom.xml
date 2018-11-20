@@ -12,6 +12,7 @@
         <module>acuprpc-protocol-grpc</module>
         <module>acuprpc-core</module>
         <module>acuprpc-spring-boot-starter</module>
+        <module>acuprpc-protocol-thrift</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>

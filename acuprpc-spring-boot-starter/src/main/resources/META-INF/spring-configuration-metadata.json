@@ -24,6 +24,16 @@
       "name": "acuprpc.registerWithDiscovery",
       "type": "java.lang.Boolean",
       "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
+    },
+    {
+      "name": "acuprpc.rpcServerClass",
+      "type": "java.lang.Class<? extends com.acupt.acuprpc.server.RpcServer>",
+      "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
+    },
+    {
+      "name": "acuprpc.rpcClientClass",
+      "type": "java.lang.Class<? extends com.acupt.acuprpc.client.RpcClient>",
+      "sourceType": "com.acupt.acuprpc.core.conf.RpcConf"
     }
   ]
 }
