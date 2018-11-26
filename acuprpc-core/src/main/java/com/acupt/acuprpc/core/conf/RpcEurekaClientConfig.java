@@ -5,7 +5,6 @@ import com.netflix.discovery.EurekaClientConfig;
 import com.netflix.discovery.endpoint.EndpointUtils;
 import com.netflix.discovery.shared.transport.EurekaTransportConfig;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -406,7 +405,7 @@ public class RpcEurekaClientConfig implements EurekaClientConfig {
         if (serviceUrls == null || serviceUrls.isEmpty()) {
             serviceUrls = this.serviceUrl.get(DEFAULT_ZONE);
         }
-        if (!StringUtils.isEmpty(serviceUrls)) {
+        if (serviceUrls != null && !serviceUrls.trim().equals("")) {
             final String[] serviceUrlsSplit = serviceUrls.split(",");
             List<String> eurekaServiceUrls = new ArrayList<>(serviceUrlsSplit.length);
             for (String eurekaServiceUrl : serviceUrlsSplit) {
