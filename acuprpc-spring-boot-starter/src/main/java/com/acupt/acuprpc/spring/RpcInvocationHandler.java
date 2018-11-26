@@ -2,14 +2,18 @@ package com.acupt.acuprpc.spring;
 
 import com.acupt.acuprpc.client.RpcClient;
 import com.acupt.acuprpc.core.NodeInfo;
-import com.acupt.acuprpc.core.RpcMethodInfo;
+import com.acupt.acuprpc.core.RpcRequest;
 import com.acupt.acuprpc.core.RpcServiceInfo;
 import com.acupt.acuprpc.exception.RpcNotFoundException;
+import com.acupt.acuprpc.util.JsonUtil;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.ConnectException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @author liujie
@@ -34,18 +38,23 @@ public class RpcInvocationHandler implements InvocationHandler {
         if ("toString".equals(method.getName()) && (args == null || args.length == 0)) {
             return rpcServiceInfo.toString();//debug时老是被ide调用然后抛异常，很烦
         }
-        RpcMethodInfo methodInfo = new RpcMethodInfo(rpcServiceInfo, method.getName(), method.getGenericReturnType());
+//        RpcMethodInfo methodInfo = new RpcMethodInfo(rpcServiceInfo, method.getName(), method.getGenericReturnType());
+        RpcRequest rpcRequest = new RpcRequest(rpcServiceInfo.getAppName(), rpcServiceInfo.getServiceName(), method.getName());
+        if (args != null && args.length > 0) {
+            rpcRequest.setOrderedParameter(Arrays.stream(args).map(JsonUtil::toJson).collect(Collectors.toList()));
+        }
         int n = 3;
         RpcClient client = null;
         for (int i = 0; i < n; i++) {
             try {
                 client = getRpcClient();
-                return client.invoke(methodInfo, args);
+                String res = client.invoke(rpcRequest);
+                JsonUtil.fromJson(res, TypeFactory.defaultInstance().constructType(method.getGenericReturnType()));
             } catch (Exception e) {
                 assert client != null;
                 boolean rediscover = needRediscover(e);
                 log.error("invoke {}/{} {} {} error={} msg={} rediscover={}",
-                        i + 1, n, methodInfo, client.getNodeInfo(), e.getClass().getName(), e.getMessage(), rediscover);
+                        i + 1, n, rpcRequest.getKey(), client.getNodeInfo(), e.getClass().getName(), e.getMessage(), rediscover);
                 if (rediscover) {
                     try {
                         NodeInfo nodeInfo = rpcServiceManager.selectNode(rpcServiceInfo);
