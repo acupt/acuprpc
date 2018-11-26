@@ -26,21 +26,12 @@ public class GrpcService extends GrpcServiceGrpc.GrpcServiceImplBase {
                 request.getServiceName(),
                 request.getMethodName(),
                 request.getOrderedParameterList());
-        RpcResponse rpcResponse;
-        InvokeResponse response;
-        try {
-            rpcResponse = rpcServer.execute(rpcRequest);
-            response = InvokeResponse.newBuilder()
-                    .setCode(rpcResponse.getCode())
-                    .setMessage(rpcResponse.getMessage())
-                    .setResult(rpcResponse.getResultString())
-                    .build();
-        } catch (Exception e) {
-            response = InvokeResponse.newBuilder()
-                    .setCode(500)
-                    .setMessage("execute error " + e.getClass().getSimpleName() + " " + e.getMessage())
-                    .build();
-        }
+        RpcResponse rpcResponse = rpcServer.execute(rpcRequest);
+        InvokeResponse response = InvokeResponse.newBuilder()
+                .setCode(rpcResponse.getCode())
+                .setMessage(rpcResponse.getMessage())
+                .setResult(rpcResponse.getResultString())
+                .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

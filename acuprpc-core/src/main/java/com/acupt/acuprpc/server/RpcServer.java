@@ -49,12 +49,15 @@ public abstract class RpcServer {
     }
 
     public RpcResponse execute(RpcRequest rpcRequest) {
-        ServiceExecutor executor = serviceExecutorMap.get(new RpcServiceInfo(rpcRequest.getAppName(),
-                rpcRequest.getServiceName()));
-        if (executor == null) {
-            return new RpcResponse(404, "service not found");
+        try {
+            ServiceExecutor executor = serviceExecutorMap.get(new RpcServiceInfo(rpcRequest.getAppName(), rpcRequest.getServiceName()));
+            if (executor == null) {
+                return new RpcResponse(404, "service not found");
+            }
+            return new RpcResponse(executor.execute(rpcRequest));
+        } catch (Exception e) {
+            return new RpcResponse(500, e.getClass().getSimpleName() + ":" + e.getMessage());
         }
-        return new RpcResponse(executor.execute(rpcRequest));
     }
 
     public void registerService(RpcServiceInfo rpcServiceInfo,

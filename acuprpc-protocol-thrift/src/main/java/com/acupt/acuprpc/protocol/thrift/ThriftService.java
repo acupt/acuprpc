@@ -24,16 +24,11 @@ public class ThriftService implements com.acupt.acuprpc.protocol.thrift.proto.Th
                 invokeRequest.getServiceName(),
                 invokeRequest.getMethodName(),
                 invokeRequest.getOrderedParameter());
+        RpcResponse rpcResponse = rpcServer.execute(rpcRequest);
         InvokeResponse response = new InvokeResponse();
-        try {
-            RpcResponse rpcResponse = rpcServer.execute(rpcRequest);
-            response.setCode(rpcResponse.getCode());
-            response.setMessage(rpcResponse.getMessage());
-            response.setResult(rpcResponse.getResultString());
-        } catch (Exception e) {
-            response.setCode(500);
-            response.setMessage("execute error " + e.getClass().getSimpleName() + " " + e.getMessage());
-        }
+        response.setCode(rpcResponse.getCode());
+        response.setMessage(rpcResponse.getMessage());
+        response.setResult(rpcResponse.getResultString());
         return response;
     }
 }
