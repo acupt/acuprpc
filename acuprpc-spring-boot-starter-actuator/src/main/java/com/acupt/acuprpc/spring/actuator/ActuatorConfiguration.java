@@ -1,7 +1,8 @@
 package com.acupt.acuprpc.spring.actuator;
 
 import com.acupt.acuprpc.server.RpcServer;
-import com.acupt.acuprpc.spring.RpcServiceConsumer;
+import com.acupt.acuprpc.server.filter.impl.RequestMonitorFilter;
+import com.acupt.acuprpc.spring.actuator.endpoint.RpcStatEndPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,15 +15,13 @@ public class ActuatorConfiguration {
     private boolean defaultSensitive = false;
 
     @Bean
-    public RpcStatusEndPoint rpcInfoEndPoint(RpcServer rpcServer, RpcServiceConsumer rpcServiceConsumer) {
-        RpcStatusEndPoint point = new RpcStatusEndPoint(rpcServer, rpcServiceConsumer);
-        point.setSensitive(defaultSensitive);
-        return point;
+    public RequestMonitorFilter requestMonitorFilter(RpcServer rpcServer) {
+        return rpcServer.addFilter(new RequestMonitorFilter());
     }
 
     @Bean
-    public RpcDumpEndPoint rpcDumpEndPoint(RpcServer rpcServer, RpcServiceConsumer rpcServiceConsumer) {
-        RpcDumpEndPoint point = new RpcDumpEndPoint(rpcServer, rpcServiceConsumer);
+    public RpcStatEndPoint rpcInfoEndPoint(RequestMonitorFilter requestMonitorFilter) {
+        RpcStatEndPoint point = new RpcStatEndPoint(requestMonitorFilter);
         point.setSensitive(defaultSensitive);
         return point;
     }

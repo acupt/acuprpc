@@ -61,7 +61,7 @@ public abstract class RpcServer {
         try {
             chain.doFilter(rpcRequest, rpcResponse);
         } catch (Exception e) {
-            rpcResponse.error(500, e);
+            rpcResponse.error(e);
         }
         return rpcResponse;
     }
@@ -78,8 +78,8 @@ public abstract class RpcServer {
         serviceExecutorMap.put(rpcServiceInfo, executor);
     }
 
-    public void addFilter(RpcFilter filter) {
+    public <T extends RpcFilter> T addFilter(T filter) {
         filters.add(filter);
+        return filter;
     }
-
 }

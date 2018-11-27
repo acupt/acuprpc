@@ -1,4 +1,4 @@
-package com.acupt.acuprpc.spring.actuator;
+package com.acupt.acuprpc.spring.actuator.endpoint;
 
 import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
 

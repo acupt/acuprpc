@@ -19,8 +19,8 @@ public class RpcResponse {
         this.result = result;
     }
 
-    public void error(int code, Throwable t) {
-        this.error(code, t != null ? t.getClass() + ":" + t.getMessage() : "");
+    public void error(Throwable t) {
+        this.error(500, t != null ? t.getClass() + ":" + t.getMessage() : "");
     }
 
     public void error(int code, String message) {
