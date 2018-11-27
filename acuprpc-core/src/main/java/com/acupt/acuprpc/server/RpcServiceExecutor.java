@@ -2,6 +2,7 @@ package com.acupt.acuprpc.server;
 
 import com.acupt.acuprpc.core.MethodInfo;
 import com.acupt.acuprpc.core.RpcRequest;
+import com.acupt.acuprpc.core.RpcResponse;
 import com.acupt.acuprpc.exception.RpcException;
 import com.acupt.acuprpc.util.JsonUtil;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -15,25 +16,26 @@ import java.util.Map;
 /**
  * @author liujie
  */
-public class ServiceExecutor {
+public class RpcServiceExecutor {
 
     private Object serviceInstance;
 
     private Map<String, MethodInfo> methodInfoMap;
 
-    public ServiceExecutor(Object serviceInstance, Map<String, MethodInfo> methodInfoMap) {
+    RpcServiceExecutor(Object serviceInstance, Map<String, MethodInfo> methodInfoMap) {
         this.serviceInstance = serviceInstance;
         this.methodInfoMap = methodInfoMap;
     }
 
     @SneakyThrows
-    public Object execute(RpcRequest rpcRequest) {
+    public void execute(RpcRequest rpcRequest, RpcResponse rpcResponse) {
         MethodInfo methodInfo = methodInfoMap.get(rpcRequest.getMethodName());
         if (methodInfo == null) {
             throw new RpcException("method not found:" + rpcRequest.getKey());
         }
-        return methodInfo.getMethod().invoke(serviceInstance,
+        Object result = methodInfo.getMethod().invoke(serviceInstance,
                 convertParameter(methodInfo.getMethod(), rpcRequest.getOrderedParameter()));
+        rpcResponse.success(result);
     }
 
     private Object[] convertParameter(Method method, List<String> orderedParameter) {

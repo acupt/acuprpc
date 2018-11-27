@@ -38,7 +38,6 @@ public class RpcInvocationHandler implements InvocationHandler {
         if ("toString".equals(method.getName()) && (args == null || args.length == 0)) {
             return rpcServiceInfo.toString();//debug时老是被ide调用然后抛异常，很烦
         }
-//        RpcMethodInfo methodInfo = new RpcMethodInfo(rpcServiceInfo, method.getName(), method.getGenericReturnType());
         RpcRequest rpcRequest = new RpcRequest(rpcServiceInfo.getAppName(), rpcServiceInfo.getServiceName(), method.getName());
         if (args != null && args.length > 0) {
             rpcRequest.setOrderedParameter(Arrays.stream(args).map(JsonUtil::toJson).collect(Collectors.toList()));
@@ -51,7 +50,9 @@ public class RpcInvocationHandler implements InvocationHandler {
                 String res = client.invoke(rpcRequest);
                 JsonUtil.fromJson(res, TypeFactory.defaultInstance().constructType(method.getGenericReturnType()));
             } catch (Exception e) {
-                assert client != null;
+                if (client == null) {
+                    throw e;
+                }
                 boolean rediscover = needRediscover(e);
                 log.error("invoke {}/{} {} {} error={} msg={} rediscover={}",
                         i + 1, n, rpcRequest.getKey(), client.getNodeInfo(), e.getClass().getName(), e.getMessage(), rediscover);

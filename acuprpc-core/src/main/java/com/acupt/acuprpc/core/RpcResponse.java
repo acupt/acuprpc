@@ -1,11 +1,7 @@
 package com.acupt.acuprpc.core;
 
 import com.acupt.acuprpc.util.JsonUtil;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NonNull;
-
-import java.util.List;
 
 /**
  * @author liujie
@@ -17,13 +13,19 @@ public class RpcResponse {
     private String message = "";
     private Object result;
 
-    public RpcResponse(int code, String message) {
-        this.code = code;
-        this.message = message;
+    public void success(Object result) {
+        this.code = 0;
+        this.message = "";
+        this.result = result;
     }
 
-    public RpcResponse(Object result) {
-        this.result = result;
+    public void error(int code, Throwable t) {
+        this.error(code, t != null ? t.getClass() + ":" + t.getMessage() : "");
+    }
+
+    public void error(int code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
     public String getResultString() {
