@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "acuprpc.endpoints.sensitive",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.acupt.acuprpc.spring.actuator.ActuatorConfiguration"
+    },
+    {
+      "name": "acuprpc.endpoints.ipWhiteList",
+      "type": "java.lang.String",
+      "sourceType": "com.acupt.acuprpc.spring.actuator.ActuatorConfiguration"
+    }
+  ]
+}

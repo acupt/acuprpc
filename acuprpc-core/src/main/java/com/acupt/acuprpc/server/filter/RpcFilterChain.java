@@ -1,5 +1,6 @@
 package com.acupt.acuprpc.server.filter;
 
+import com.acupt.acuprpc.core.RpcCode;
 import com.acupt.acuprpc.core.RpcRequest;
 import com.acupt.acuprpc.core.RpcResponse;
 import com.acupt.acuprpc.core.RpcServiceInfo;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * @author liujie
  */
-public class RpcFilterChain {
+public class RpcFilterChain implements RpcCode {
 
     private RpcFilter[] filters = new RpcFilter[0];
 
@@ -36,7 +37,7 @@ public class RpcFilterChain {
             return;
         }
         if (serviceExecutor == null) {
-            response.error(404, "service not exist: " + serviceInfo);
+            response.error(SERVICE_NOT_FOUND, "service not exist: " + serviceInfo);
             return;
         }
         serviceExecutor.execute(request, response);

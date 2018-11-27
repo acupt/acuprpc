@@ -1,9 +1,10 @@
 package com.acupt.acuprpc.protocol.grpc;
 
-import com.acupt.acuprpc.core.RpcRequest;
 import com.acupt.acuprpc.client.RpcClient;
 import com.acupt.acuprpc.core.NodeInfo;
-import com.acupt.acuprpc.exception.RpcException;
+import com.acupt.acuprpc.core.RpcCode;
+import com.acupt.acuprpc.core.RpcRequest;
+import com.acupt.acuprpc.exception.HttpStatusException;
 import com.acupt.acuprpc.protocol.grpc.proto.GrpcServiceGrpc;
 import com.acupt.acuprpc.protocol.grpc.proto.InvokeRequest;
 import com.acupt.acuprpc.protocol.grpc.proto.InvokeResponse;
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author liujie
  */
-public class GrpcClient extends RpcClient {
+public class GrpcClient extends RpcClient implements RpcCode {
 
     private AtomicReference<GrpcServiceGrpc.GrpcServiceBlockingStub> stubRef;
 
@@ -37,8 +38,8 @@ public class GrpcClient extends RpcClient {
             builder.addAllOrderedParameter(rpcRequest.getOrderedParameter());
         }
         InvokeResponse response = stubRef.get().invokeMethod(builder.build());
-        if (response.getCode() != 0) {
-            throw new RpcException(response.getCode() + ":" + response.getMessage());
+        if (response.getCode() != SUCCESS) {
+            throw new HttpStatusException(response.getCode(), response.getMessage());
         }
         return response.getResult();
     }

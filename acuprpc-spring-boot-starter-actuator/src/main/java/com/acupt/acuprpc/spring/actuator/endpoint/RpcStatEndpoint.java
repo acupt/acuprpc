@@ -9,11 +9,11 @@ import java.util.Map;
 /**
  * @author liujie
  */
-public class RpcStatEndPoint extends AbstractRpcEndPoint<Map<String, Object>> {
+public class RpcStatEndpoint extends AbstractRpcEndpoint<Map<String, Object>> {
 
     private MonitorFilter filter;
 
-    public RpcStatEndPoint(MonitorFilter filter) {
+    public RpcStatEndpoint(MonitorFilter filter) {
         super("stat");
         this.filter = filter;
     }

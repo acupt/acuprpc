@@ -3,7 +3,9 @@ package com.acupt.acuprpc.protocol.thrift;
 
 import com.acupt.acuprpc.client.RpcClient;
 import com.acupt.acuprpc.core.NodeInfo;
+import com.acupt.acuprpc.core.RpcCode;
 import com.acupt.acuprpc.core.RpcRequest;
+import com.acupt.acuprpc.exception.HttpStatusException;
 import com.acupt.acuprpc.exception.RpcException;
 import com.acupt.acuprpc.protocol.thrift.proto.InvokeRequest;
 import com.acupt.acuprpc.protocol.thrift.proto.InvokeResponse;
@@ -19,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author liujie
  */
-public class ThriftClient extends RpcClient {
+public class ThriftClient extends RpcClient implements RpcCode {
 
     private AtomicReference<ThriftService.Client> clientRef;
 
@@ -38,8 +40,8 @@ public class ThriftClient extends RpcClient {
         request.setMethodName(rpcRequest.getMethodName());
         request.setOrderedParameter(rpcRequest.getOrderedParameter());
         InvokeResponse response = clientRef.get().invokeMethod(request);
-        if (response.getCode() != 0) {
-            throw new RpcException(response.getCode() + ":" + response.getMessage());
+        if (response.getCode() != SUCCESS) {
+            throw new HttpStatusException(response.getCode(), response.getMessage());
         }
         return response.getResult();
     }

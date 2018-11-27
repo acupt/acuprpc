@@ -5,19 +5,19 @@ import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
 /**
  * @author liujie
  */
-public abstract class AbstractRpcEndPoint<T> extends AbstractEndpoint<T> {
+public abstract class AbstractRpcEndpoint<T> extends AbstractEndpoint<T> {
 
     private static final String PREFIX = "rpc";
 
-    public AbstractRpcEndPoint(String id) {
+    public AbstractRpcEndpoint(String id) {
         super(PREFIX + id);
     }
 
-    public AbstractRpcEndPoint(String id, boolean sensitive) {
+    public AbstractRpcEndpoint(String id, boolean sensitive) {
         super(PREFIX + id, sensitive);
     }
 
-    public AbstractRpcEndPoint(String id, boolean sensitive, boolean enabled) {
+    public AbstractRpcEndpoint(String id, boolean sensitive, boolean enabled) {
         super(PREFIX + id, sensitive, enabled);
     }
 }

@@ -273,7 +273,9 @@ public RequestFilter requestFilter(RpcServer rpcServer) {
 }
 ```
 
-## 监控
+## 管理和监控
+
+基于spring-boot-starter-actuator模块提供的endpoint特性，可以用http接口与rpc服务交互。
 
 引入模块
 
@@ -285,7 +287,19 @@ public RequestFilter requestFilter(RpcServer rpcServer) {
 </dependency>
 ```
 
-请求：http://localhost:8080/rpcstat
+配置
+
+```properties
+# 此模块下的endpoint是否数据敏感，false时可直接访问，默认true
+acuprpc.endpoints.sensitive=false
+
+# 此模块下endpoint请求白名单，不设置则全部ip都可以访问
+acuprpc.endpoints.ipWhiteList=127.0.0.1,123.123.123.123
+```
+
+### 服务端执行请求统计
+
+请求：http://127.0.0.1:8080/rpcstat
 
 返回
 
@@ -303,3 +317,9 @@ public RequestFilter requestFilter(RpcServer rpcServer) {
     "serving": false //是否有正在处理的请求
 }
 ```
+
+### 管理
+
++ http://127.0.0.1:8080/rpc/status 服务状态，http status为200时为正常状态，503为下线状态
++ http://127.0.0.1:8882/rpc/offline 服务下线，所有rpc请求返回NOT_AVAILABLE，客户端会重新寻找其他节点
++ http://127.0.0.1:8882/rpc/online 服务上线
