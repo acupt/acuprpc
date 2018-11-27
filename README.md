@@ -1,10 +1,12 @@
 
++ 服务注册/发现(基于eureka)
 + 远程服务调用
   + 支持grpc
   + 支持thrift
-  + 支持自扩展 
-+ 服务注册/发现(基于eureka)
+  + 支持自扩展
 + 调用异常节点自动重试
++ 自定义request filter
++ 服务监控（acuprpc-spring-boot-starter-actuator，基于filter实现）
 
 ## 快速开始
 
@@ -236,3 +238,68 @@ public class EurekaServerApplication {
 http://localhost:8885/hello?name=tom
 
 最终会请求到service-a，然后输出结果。
+
+## filter
+
+原理和用法类似 javax.servlet.Filter
+
+```java
+package com.acupt.service.a.filter;
+
+import com.acupt.acuprpc.core.RpcRequest;
+import com.acupt.acuprpc.core.RpcResponse;
+import com.acupt.acuprpc.server.filter.RpcFilter;
+import com.acupt.acuprpc.server.filter.RpcFilterChain;
+
+/**
+ * @author liujie
+ */
+public class RequestFilter implements RpcFilter {
+
+    @Override
+    public void doFilter(RpcRequest request, RpcResponse response, RpcFilterChain filterChain) {
+        System.out.println("RequestFilter in");
+        filterChain.doFilter(request, response);
+        System.out.println("RequestFilter end");
+    }
+}
+
+```
+
+```java
+@Bean
+public RequestFilter requestFilter(RpcServer rpcServer) {
+        return rpcServer.addFilter(new RequestFilter());
+}
+```
+
+## 监控
+
+引入模块
+
+```xml
+<dependency>
+    <groupId>com.acupt</groupId>
+    <artifactId>acuprpc-spring-boot-starter-actuator</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+请求：http://localhost:8080/rpcstat
+
+返回
+
+```json
+{
+    "counts": [
+        {
+            "key": "service-a:com.acupt.service.a.api.HiService#hello", // app:service#method
+            "received": 6, // 已接收请求
+            "invoking": 0, // 处理中的请求
+            "success": 6, // 处理成功的请求
+            "failed": 0 // 处理失败的请求
+        }
+    ],
+    "serving": false //是否有正在处理的请求
+}
+```
