@@ -44,8 +44,7 @@ public abstract class RpcClient {
     }
 
     public String invoke(RpcRequest rpcRequest) {
-        RpcRequest request = new RpcRequest(rpcRequest.getAppName(), rpcRequest.getServiceName(), rpcRequest.getMethodName());
-        return remoteInvoke(request);
+        return remoteInvoke(rpcRequest);
     }
 
     public NodeInfo getNodeInfo() {

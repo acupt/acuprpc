@@ -48,7 +48,7 @@ public class RpcInvocationHandler implements InvocationHandler {
             try {
                 client = getRpcClient();
                 String res = client.invoke(rpcRequest);
-                JsonUtil.fromJson(res, TypeFactory.defaultInstance().constructType(method.getGenericReturnType()));
+                return JsonUtil.fromJson(res, TypeFactory.defaultInstance().constructType(method.getGenericReturnType()));
             } catch (Exception e) {
                 if (client == null) {
                     throw e;

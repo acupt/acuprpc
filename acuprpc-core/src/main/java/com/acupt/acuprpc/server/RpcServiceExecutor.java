@@ -44,6 +44,9 @@ public class RpcServiceExecutor {
         if (types.length == 0) {
             return paramArray;
         }
+        if (orderedParameter == null || orderedParameter.size() != types.length) {
+            throw new RpcException(method.toString() + " not support parameter: " + orderedParameter);
+        }
         for (int i = 0; i < types.length; i++) {
             paramArray[i] = JsonUtil.fromJson(orderedParameter.get(i),
                     TypeFactory.defaultInstance().constructType(types[i]));
