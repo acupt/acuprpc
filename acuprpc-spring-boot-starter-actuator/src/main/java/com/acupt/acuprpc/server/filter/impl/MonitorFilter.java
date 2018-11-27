@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.LongAdder;
 /**
  * @author liujie
  */
-public class RequestMonitorFilter implements RpcFilter {
+public class MonitorFilter implements RpcFilter {
 
     private Map<String, RequestCount> requestCountMap = new ConcurrentHashMap<>();
 
