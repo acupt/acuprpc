@@ -2,11 +2,11 @@
 + 服务注册/发现(基于eureka)
 + 远程服务调用
   + 支持grpc
-  + 支持thrift
+````  + 支持thrift（随便写写，不太完善）
   + 支持自扩展
-+ 调用异常节点自动重试
++ 调用异常/下线节点自动重试
 + 自定义request filter
-+ 服务监控（acuprpc-spring-boot-starter-actuator，基于filter实现）
++ 服务监控和管理（acuprpc-spring-boot-starter-actuator，基于filter实现）
 
 ## 快速开始
 
