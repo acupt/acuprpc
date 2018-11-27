@@ -299,7 +299,7 @@ acuprpc.endpoints.ipWhiteList=127.0.0.1,123.123.123.123
 
 ### 服务端执行请求统计
 
-请求：http://127.0.0.1:8080/rpcstat
+请求：/rpcstat
 
 返回
 
@@ -320,6 +320,6 @@ acuprpc.endpoints.ipWhiteList=127.0.0.1,123.123.123.123
 
 ### 管理
 
-+ http://127.0.0.1:8080/rpc/status 服务状态，http status为200时为正常状态，503为下线状态
-+ http://127.0.0.1:8882/rpc/offline 服务下线，所有rpc请求返回NOT_AVAILABLE，客户端会重新寻找其他节点
-+ http://127.0.0.1:8882/rpc/online 服务上线
++ /rpc/status 服务状态，http status为200时为正常状态，503为下线状态
++ /rpc/offline 服务下线，所有rpc请求返回NOT_AVAILABLE，客户端会重新寻找其他节点
++ /rpc/online 服务上线
