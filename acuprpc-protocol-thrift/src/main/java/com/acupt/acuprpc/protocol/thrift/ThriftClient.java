@@ -14,7 +14,6 @@ import lombok.SneakyThrows;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -61,9 +60,11 @@ public class ThriftClient extends RpcClient implements RpcCode {
     }
 
     private ThriftService.Client getClient(NodeInfo nodeInfo) {
-        TTransport transport = null;
+        TSocket transport = null;
         try {
             transport = new TSocket(nodeInfo.getIp(), nodeInfo.getPort());
+            transport.setConnectTimeout(getTimeout() * 1000);
+            transport.setSocketTimeout(getTimeout() * 1000);
             TProtocol protocol = new TBinaryProtocol(transport);
             ThriftService.Client client = new ThriftService.Client(protocol);
             transport.open();
