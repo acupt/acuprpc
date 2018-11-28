@@ -4,16 +4,20 @@ import com.acupt.acuprpc.core.RpcInstance;
 import com.acupt.acuprpc.exception.RpcException;
 import com.acupt.acuprpc.server.RpcServer;
 import org.apache.thrift.TProcessor;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
+
+import java.util.concurrent.Executors;
 
 /**
  * @author liujie
  */
 public class ThriftServer extends RpcServer {
+
+    private static final int nThreads = 100;
 
     private TServer server;
 
@@ -26,16 +30,16 @@ public class ThriftServer extends RpcServer {
         new Thread(() -> {
             TProcessor tprocessor = new com.acupt.acuprpc.protocol.thrift.proto.ThriftService.
                     Processor<com.acupt.acuprpc.protocol.thrift.proto.ThriftService.Iface>(new ThriftService(this));
-            TServerSocket serverTransport = null;
+            TServerTransport serverTransport = null;
             try {
                 serverTransport = new TServerSocket(getRpcInstance().getRpcConf().getPort());
             } catch (TTransportException e) {
                 throw new RpcException(e);
             }
-            TServer.Args tArgs = new TServer.Args(serverTransport);
+            TThreadPoolServer.Args tArgs = new TThreadPoolServer.Args(serverTransport);
             tArgs.processor(tprocessor);
-            tArgs.protocolFactory(new TBinaryProtocol.Factory());
-            server = new TSimpleServer(tArgs);
+            tArgs.executorService(Executors.newFixedThreadPool(nThreads));
+            server = new TThreadPoolServer(tArgs);
             server.serve();//阻塞
         }).start();
     }
