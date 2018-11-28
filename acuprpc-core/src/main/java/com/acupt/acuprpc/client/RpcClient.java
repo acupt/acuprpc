@@ -14,6 +14,8 @@ public abstract class RpcClient {
 
     private NodeInfo nodeInfo;
 
+    private int timeout = 5;
+
     public RpcClient(NodeInfo nodeInfo) {
         this.nodeInfo = nodeInfo;
     }
@@ -53,5 +55,9 @@ public abstract class RpcClient {
 
     protected void setNodeInfo(NodeInfo nodeInfo) {
         this.nodeInfo = nodeInfo;
+    }
+
+    public int getTimeout() {
+        return timeout;
     }
 }

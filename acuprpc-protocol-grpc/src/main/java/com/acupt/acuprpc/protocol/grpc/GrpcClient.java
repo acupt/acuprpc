@@ -5,12 +5,15 @@ import com.acupt.acuprpc.core.NodeInfo;
 import com.acupt.acuprpc.core.RpcCode;
 import com.acupt.acuprpc.core.RpcRequest;
 import com.acupt.acuprpc.exception.HttpStatusException;
+import com.acupt.acuprpc.exception.RpcException;
 import com.acupt.acuprpc.protocol.grpc.proto.GrpcServiceGrpc;
 import com.acupt.acuprpc.protocol.grpc.proto.InvokeRequest;
 import com.acupt.acuprpc.protocol.grpc.proto.InvokeResponse;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.AbstractStub;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.TimeUnit;
@@ -21,7 +24,9 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class GrpcClient extends RpcClient implements RpcCode {
 
-    private AtomicReference<GrpcServiceGrpc.GrpcServiceBlockingStub> stubRef;
+    private static final int shutdownTimeout = 5;
+
+    private AtomicReference<GrpcServiceGrpc.GrpcServiceFutureStub> stubRef;
 
     public GrpcClient(NodeInfo nodeInfo) {
         super(nodeInfo);
@@ -37,7 +42,13 @@ public class GrpcClient extends RpcClient implements RpcCode {
         if (rpcRequest.getOrderedParameter() != null && !rpcRequest.getOrderedParameter().isEmpty()) {
             builder.addAllOrderedParameter(rpcRequest.getOrderedParameter());
         }
-        InvokeResponse response = stubRef.get().invokeMethod(builder.build());
+        ListenableFuture<InvokeResponse> future = stubRef.get().invokeMethod(builder.build());
+        InvokeResponse response = null;
+        try {
+            response = future.get(getTimeout(), TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new RpcException(e);
+        }
         if (response.getCode() != SUCCESS) {
             throw new HttpStatusException(response.getCode(), response.getMessage());
         }
@@ -47,11 +58,10 @@ public class GrpcClient extends RpcClient implements RpcCode {
     @Override
     @SneakyThrows
     protected NodeInfo reconnectRpc(NodeInfo nodeInfo) {
-        GrpcServiceGrpc.GrpcServiceBlockingStub old =
-                stubRef.getAndUpdate(s -> getStub(nodeInfo));
-        if (old != null) {
+        AbstractStub<?> old = stubRef.getAndUpdate(s -> getStub(nodeInfo));
+        if (old != null && old.getChannel() instanceof ManagedChannel) {
             ((ManagedChannel) old.getChannel()).shutdown()
-                    .awaitTermination(5, TimeUnit.SECONDS);
+                    .awaitTermination(shutdownTimeout, TimeUnit.SECONDS);
         }
         NodeInfo oldNode = getNodeInfo();
         setNodeInfo(nodeInfo);
@@ -61,21 +71,21 @@ public class GrpcClient extends RpcClient implements RpcCode {
     @Override
     @SneakyThrows
     public void shutdownRpc() {
-        GrpcServiceGrpc.GrpcServiceBlockingStub stub = stubRef.get();
+        AbstractStub<?> stub = stubRef.get();
         if (stub == null) {
             return;
         }
         Channel channel = stub.getChannel();
         if (channel instanceof ManagedChannel) {
-            ((ManagedChannel) channel).shutdown().awaitTermination(5, TimeUnit.SECONDS);
+            ((ManagedChannel) channel).shutdown().awaitTermination(shutdownTimeout, TimeUnit.SECONDS);
         }
     }
 
-    private GrpcServiceGrpc.GrpcServiceBlockingStub getStub(NodeInfo nodeInfo) {
+    private GrpcServiceGrpc.GrpcServiceFutureStub getStub(NodeInfo nodeInfo) {
         Channel channel = ManagedChannelBuilder
                 .forAddress(nodeInfo.getIp(), nodeInfo.getPort())
                 .usePlaintext(true)
                 .build();
-        return GrpcServiceGrpc.newBlockingStub(channel);
+        return GrpcServiceGrpc.newFutureStub(channel);
     }
 }
