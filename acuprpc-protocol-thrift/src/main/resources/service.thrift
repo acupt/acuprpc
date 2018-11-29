@@ -8,6 +8,7 @@ struct InvokeRequest{
 2: required string serviceName;
 3: required string methodName;
 4: required list<string> orderedParameter;
+5: required map<string,string> namedParameter;
 }
 
 struct InvokeResponse{

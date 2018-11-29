@@ -25,7 +25,8 @@ public class GrpcService extends GrpcServiceGrpc.GrpcServiceImplBase {
                 request.getAppName(),
                 request.getServiceName(),
                 request.getMethodName(),
-                request.getOrderedParameterList());
+                request.getOrderedParameterList(),
+                request.getNamedParameterMap());
         RpcResponse rpcResponse = rpcServer.execute(rpcRequest);
         InvokeResponse response = InvokeResponse.newBuilder()
                 .setCode(rpcResponse.getCode())

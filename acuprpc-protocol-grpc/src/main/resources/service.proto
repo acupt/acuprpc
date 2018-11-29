@@ -19,6 +19,7 @@ message InvokeRequest {
     string serviceName = 2;
     string methodName = 3;
     repeated string orderedParameter = 4;
+    map<string, string> namedParameter = 5;
 }
 
 message InvokeResponse {

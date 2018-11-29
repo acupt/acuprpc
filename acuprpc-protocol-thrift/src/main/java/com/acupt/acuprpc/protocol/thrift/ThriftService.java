@@ -23,7 +23,8 @@ public class ThriftService implements com.acupt.acuprpc.protocol.thrift.proto.Th
                 invokeRequest.getAppName(),
                 invokeRequest.getServiceName(),
                 invokeRequest.getMethodName(),
-                invokeRequest.getOrderedParameter());
+                invokeRequest.getOrderedParameter(),
+                invokeRequest.getNamedParameter());
         RpcResponse rpcResponse = rpcServer.execute(rpcRequest);
         InvokeResponse response = new InvokeResponse();
         response.setCode(rpcResponse.getCode());

@@ -42,6 +42,9 @@ public class GrpcClient extends RpcClient implements RpcCode {
         if (rpcRequest.getOrderedParameter() != null && !rpcRequest.getOrderedParameter().isEmpty()) {
             builder.addAllOrderedParameter(rpcRequest.getOrderedParameter());
         }
+        if (rpcRequest.getNamedParameter() != null && !rpcRequest.getNamedParameter().isEmpty()) {
+            builder.putAllNamedParameter(rpcRequest.getNamedParameter());
+        }
         ListenableFuture<InvokeResponse> future = stubRef.get().invokeMethod(builder.build());
         InvokeResponse response = null;
         try {

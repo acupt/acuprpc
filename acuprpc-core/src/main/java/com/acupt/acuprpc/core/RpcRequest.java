@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author liujie
@@ -15,7 +16,8 @@ public class RpcRequest {
     private String appName;
     private String serviceName;
     private String methodName;
-    private List<String> orderedParameter;
+    private List<String> orderedParameter;//优先，null/empty时尝试map
+    private Map<String, String> namedParameter;
 
     public RpcRequest(String appName, String serviceName, String methodName) {
         this.appName = appName;

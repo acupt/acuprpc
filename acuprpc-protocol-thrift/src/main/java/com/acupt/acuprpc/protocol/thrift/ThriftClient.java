@@ -71,6 +71,7 @@ public class ThriftClient extends RpcClient implements RpcCode {
         request.setServiceName(rpcRequest.getServiceName());
         request.setMethodName(rpcRequest.getMethodName());
         request.setOrderedParameter(rpcRequest.getOrderedParameter());
+        request.setNamedParameter(rpcRequest.getNamedParameter());
         ThriftService.Client client = null;
         try {
             client = getClient();
