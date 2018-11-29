@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author liujie
  */
 @Slf4j
-public class RpcServiceManager {
+public class RpcClientManager {
 
     private RpcInstance rpcInstance;
 
@@ -28,20 +28,20 @@ public class RpcServiceManager {
 
     private Random random = new Random();
 
-    public RpcServiceManager(RpcInstance rpcInstance) {
+    public RpcClientManager(RpcInstance rpcInstance) {
         this.rpcInstance = rpcInstance;
         new Thread(() -> {
             while (true) {
+                try {
+                    Thread.sleep(30000);
+                } catch (InterruptedException e) {
+                    log.error("rpc relookup sleep error " + e.getMessage(), e);
+                }
                 try {
                     relookup();
                     log.info("rpc relookup finish");
                 } catch (Exception e) {
                     log.error("rpc relookup error " + e.getMessage(), e);
-                }
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e) {
-                    log.error("rpc relookup sleep error " + e.getMessage(), e);
                 }
             }
         }).start();

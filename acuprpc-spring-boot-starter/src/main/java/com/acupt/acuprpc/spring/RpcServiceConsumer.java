@@ -9,10 +9,10 @@ import java.lang.reflect.Proxy;
  */
 public class RpcServiceConsumer {
 
-    private RpcServiceManager rpcServiceManager;
+    private RpcClientManager rpcClientManager;
 
-    public RpcServiceConsumer(RpcServiceManager rpcServiceManager) {
-        this.rpcServiceManager = rpcServiceManager;
+    public RpcServiceConsumer(RpcClientManager rpcClientManager) {
+        this.rpcClientManager = rpcClientManager;
     }
 
     @SuppressWarnings("unchecked")
@@ -21,6 +21,6 @@ public class RpcServiceConsumer {
         return (T) Proxy.newProxyInstance(
                 serviceInterface.getClassLoader(),
                 new Class<?>[]{serviceInterface},
-                new RpcInvocationHandler(serviceInfo, rpcServiceManager));
+                new RpcInvocationHandler(serviceInfo, rpcClientManager));
     }
 }

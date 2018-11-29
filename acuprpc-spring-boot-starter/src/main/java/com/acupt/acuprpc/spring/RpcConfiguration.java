@@ -30,13 +30,13 @@ public class RpcConfiguration {
     }
 
     @Bean
-    public RpcServiceManager rpcServiceManager(RpcInstance rpcInstance) {
-        return new RpcServiceManager(rpcInstance);
+    public RpcClientManager rpcClientManager(RpcInstance rpcInstance) {
+        return new RpcClientManager(rpcInstance);
     }
 
     @Bean
-    public RpcServiceConsumer rpcServiceConsumer(RpcServiceManager rpcServiceManager) {
-        return new RpcServiceConsumer(rpcServiceManager);
+    public RpcServiceConsumer rpcServiceConsumer(RpcClientManager rpcClientManager) {
+        return new RpcServiceConsumer(rpcClientManager);
     }
 
     @Bean

@@ -25,13 +25,13 @@ public class RpcInvocationHandler implements InvocationHandler, RpcCode {
 
     private RpcServiceInfo rpcServiceInfo;
 
-    private RpcServiceManager rpcServiceManager;
+    private RpcClientManager rpcClientManager;
 
     private RpcClient rpcClient;
 
-    public RpcInvocationHandler(RpcServiceInfo rpcServiceInfo, RpcServiceManager rpcServiceManager) {
+    public RpcInvocationHandler(RpcServiceInfo rpcServiceInfo, RpcClientManager rpcClientManager) {
         this.rpcServiceInfo = rpcServiceInfo;
-        this.rpcServiceManager = rpcServiceManager;
+        this.rpcClientManager = rpcClientManager;
         tryInitRpcClient(false);
     }
 
@@ -61,7 +61,7 @@ public class RpcInvocationHandler implements InvocationHandler, RpcCode {
                         i, n, rpcRequest.getKey(), client.getNodeInfo(), e.getClass().getName(), e.getMessage(), rediscover);
                 if (rediscover) {
                     try {
-                        NodeInfo nodeInfo = rpcServiceManager.selectNode(rpcServiceInfo);
+                        NodeInfo nodeInfo = rpcClientManager.selectNode(rpcServiceInfo);
                         client.reconnect(nodeInfo);
                         continue;
                     } catch (RpcNotFoundException e1) {
@@ -86,7 +86,7 @@ public class RpcInvocationHandler implements InvocationHandler, RpcCode {
             return;
         }
         try {
-            rpcClient = rpcServiceManager.lookup(rpcServiceInfo);
+            rpcClient = rpcClientManager.lookup(rpcServiceInfo);
         } catch (Exception e) {
             if (throwError) {
                 throw e;
