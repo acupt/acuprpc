@@ -5,6 +5,8 @@ import com.acupt.acuprpc.core.RpcRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author liujie
@@ -46,6 +48,12 @@ public abstract class RpcClient {
     }
 
     public String invoke(RpcRequest rpcRequest) {
+        if (rpcRequest.getNamedParameter() == null) {
+            rpcRequest.setNamedParameter(new HashMap<>(0));
+        }
+        if (rpcRequest.getOrderedParameter() == null) {
+            rpcRequest.setOrderedParameter(new ArrayList<>(0));
+        }
         return remoteInvoke(rpcRequest);
     }
 

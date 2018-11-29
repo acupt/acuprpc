@@ -9,6 +9,7 @@ import com.acupt.acuprpc.exception.RpcException;
 import com.acupt.acuprpc.util.JsonUtil;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -19,6 +20,7 @@ import java.util.Map;
 /**
  * @author liujie
  */
+@Slf4j
 public class RpcServiceExecutor implements RpcCode {
 
     private Object serviceInstance;
@@ -67,10 +69,32 @@ public class RpcServiceExecutor implements RpcCode {
     private Object[] convertParameter(Method method, Map<String, String> namedParameter) {
         Parameter[] parameters = method.getParameters();
         Object[] paramArray = new Object[parameters.length];
+        if (parameters.length == 0) {
+            return paramArray;
+        }
+        boolean allNull = true;
         for (int i = 0; i < paramArray.length; i++) {
-            String json = namedParameter.get(parameters[i].getName());
-            paramArray[i] = JsonUtil.fromJson(json,
-                    TypeFactory.defaultInstance().constructType(parameters[i].getType()));
+            String name = parameters[i].getName();
+            String json = namedParameter.get(name);
+            if (json == null) {
+                paramArray[i] = null;
+            } else {
+                allNull = false;
+                paramArray[i] = JsonUtil.fromJson(json,
+                        TypeFactory.defaultInstance().constructType(parameters[i].getType()));
+            }
+        }
+        if (allNull) {
+            boolean needParameters = true;
+            for (int i = 0; i < parameters.length; i++) {
+                if (!("arg" + i).equalsIgnoreCase(parameters[i].getName())) {
+                    needParameters = false;
+                    break;
+                }
+            }
+            if (needParameters) {
+                log.warn("can't resolve parameter for " + method.toString() + ", try add compiler args: -parameters");
+            }
         }
         return paramArray;
     }

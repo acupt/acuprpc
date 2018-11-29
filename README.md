@@ -7,6 +7,7 @@
 + 调用异常/下线节点自动重试
 + 自定义request filter
 + 服务监控和管理（acuprpc-spring-boot-starter-actuator，基于filter实现）
++ 网关支持
 
 ## 快速开始
 
@@ -323,3 +324,66 @@ acuprpc.endpoints.ipWhiteList=127.0.0.1,123.123.123.123
 + /rpc/status 服务状态，http status为200时为正常状态，503为下线状态
 + /rpc/offline 服务下线，所有rpc请求返回NOT_AVAILABLE，客户端会重新寻找其他节点
 + /rpc/online 服务上线
+
+
+## 网关支持
+
+引入acuprpc-spring-boot-starter-gateway模块即可得到一个不能再简单的网关。
+
+原理是一个controller
+
+```java
+@RestController
+@RequestMapping("/api")
+public class ApiController {
+
+    /**
+     * 动态调用rpc服务的关键，在acuprpc-spring-boot-starter中已经生成，可以随时引用
+     */
+    private RpcClientManager rpcClientManager;
+
+    public ApiController(RpcClientManager rpcClientManager) {
+        this.rpcClientManager = rpcClientManager;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    public Object invoke(@RequestBody RpcRequestDTO requestDTO) {
+        RpcServiceInfo serviceInfo = new RpcServiceInfo(requestDTO.getApp(), requestDTO.getService());
+        RpcClient client = rpcClientManager.lookup(serviceInfo);//获取一个可以提供所需服务的连接
+        RpcRequest request = new RpcRequest(requestDTO.getApp(), requestDTO.getService(), requestDTO.getMethod());
+        if (requestDTO.getParameters() != null) {
+            Map<String, String> map = new HashMap<>();
+            requestDTO.getParameters().forEach((k, v) -> map.put(k, JsonUtil.toJson(v)));
+            request.setNamedParameter(map);
+        }
+        return client.invoke(request);//调用服务获得返回的json字符串
+    }
+}
+```
+
+### 使用方法
+
+引入依赖
+
+```xml
+<dependency>
+    <groupId>com.acupt</groupId>
+    <artifactId>acuprpc-spring-boot-starter-gateway</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
++ post
++ http://localhost:8080/api
++ application/json
+
+```json
+{
+  "app": "service-a",
+  "service": "com.acupt.service.a.api.HiService",
+  "method": "hello",
+  "parameters": {
+    "name": "liu"
+  }
+}
+```
