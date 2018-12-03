@@ -40,7 +40,7 @@ public class ActuatorConfiguration {
     }
 
     @Bean
-    public ReflectEndpointMvcAdapter rpcHealthEndpoint(RejectFilter rejectFilter) {
+    public ReflectEndpointMvcAdapter rpcEndpoint(RejectFilter rejectFilter) {
         return new ReflectEndpointMvcAdapter(process(new RpcEndpoint(rejectFilter)), ipWhiteList);
     }
 

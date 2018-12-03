@@ -51,6 +51,7 @@ public class RpcServiceScanner implements BeanPostProcessor {
         if (interfaces.length == 0) {
             return bean;
         }
+        // client是通过接口调用server的，因此并不知道具体实现类的路径，只有接口名，因此把所有接口都注册一遍
         for (Class<?> serviceInterface : interfaces) {
             rpcServer.registerService(
                     new RpcServiceInfo(rpcServer.getRpcInstance().getRpcConf().getAppName(),

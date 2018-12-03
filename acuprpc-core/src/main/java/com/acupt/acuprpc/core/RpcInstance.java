@@ -64,11 +64,17 @@ public class RpcInstance {
         eurekaClient.shutdown();
     }
 
+    /**
+     * 创建一个rpc server，根据配置的调用方式（实现类）生成对象
+     */
     @SneakyThrows
     public RpcServer newRpcServer() {
         return rpcConf.getRpcServerClass().getConstructor(RpcInstance.class).newInstance(this);
     }
 
+    /**
+     * 创建一个rpc client，根据配置的调用方式（实现类）生成对象
+     */
     @SneakyThrows
     public RpcClient newRpcClient(NodeInfo nodeInfo) {
         return rpcConf.getRpcClientClass().getConstructor(NodeInfo.class).newInstance(nodeInfo);

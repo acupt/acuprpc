@@ -17,8 +17,8 @@ public class GrpcServer extends RpcServer {
         super(rpcInstance);
     }
 
-
     @SneakyThrows
+    @Override
     protected void startRpc() {
         server = ServerBuilder
                 .forPort(getRpcInstance().getRpcConf().getPort())
@@ -26,6 +26,7 @@ public class GrpcServer extends RpcServer {
                 .build().start();
     }
 
+    @Override
     protected void shutdownRpc() {
         if (server != null) {
             server.shutdown();
