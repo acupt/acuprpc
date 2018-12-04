@@ -37,7 +37,7 @@ public class RpcResponse implements RpcCode {
         message = "service not available";
     }
 
-    public String getResultString() {
+    public String jsonResult() {
         return JsonUtil.toJson(result);
     }
 }

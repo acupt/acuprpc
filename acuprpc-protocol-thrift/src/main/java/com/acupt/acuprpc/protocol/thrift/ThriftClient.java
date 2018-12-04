@@ -91,9 +91,7 @@ public class ThriftClient extends RpcClient implements RpcCode {
     @SneakyThrows
     protected NodeInfo reconnectRpc(NodeInfo nodeInfo) {
         clientPool.clear();
-        NodeInfo oldInfo = getNodeInfo();
-        setNodeInfo(nodeInfo);
-        return oldInfo;
+        return setNodeInfo(nodeInfo);
     }
 
     @Override

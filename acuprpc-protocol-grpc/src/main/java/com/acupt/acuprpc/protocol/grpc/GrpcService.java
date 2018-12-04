@@ -31,7 +31,7 @@ public class GrpcService extends GrpcServiceGrpc.GrpcServiceImplBase {
         InvokeResponse response = InvokeResponse.newBuilder()
                 .setCode(rpcResponse.getCode())
                 .setMessage(rpcResponse.getMessage())
-                .setResult(rpcResponse.getResultString())
+                .setResult(rpcResponse.jsonResult())
                 .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();

@@ -29,7 +29,7 @@ public class ThriftService implements com.acupt.acuprpc.protocol.thrift.proto.Th
         InvokeResponse response = new InvokeResponse();
         response.setCode(rpcResponse.getCode());
         response.setMessage(rpcResponse.getMessage());
-        response.setResult(rpcResponse.getResultString());
+        response.setResult(rpcResponse.jsonResult());
         return response;
     }
 }

@@ -61,11 +61,17 @@ public abstract class RpcClient {
         return nodeInfo;
     }
 
-    protected void setNodeInfo(NodeInfo nodeInfo) {
+    protected NodeInfo setNodeInfo(NodeInfo nodeInfo) {
+        NodeInfo old = this.nodeInfo;
         this.nodeInfo = nodeInfo;
+        return old;
     }
 
-    public int getTimeout() {
+    protected int getTimeout() {
         return timeout;
+    }
+
+    protected int getTimeoutMilliseconds() {
+        return timeout * 1000;
     }
 }

@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Data
 @Slf4j
-public abstract class RpcServer {
+public abstract class RpcServer implements RpcCode {
 
     private Map<RpcServiceInfo, RpcServiceExecutor> serviceExecutorMap = new ConcurrentHashMap<>();
 

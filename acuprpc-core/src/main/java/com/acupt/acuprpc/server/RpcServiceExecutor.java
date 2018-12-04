@@ -36,7 +36,7 @@ public class RpcServiceExecutor implements RpcCode {
     public void execute(RpcRequest rpcRequest, RpcResponse rpcResponse) {
         MethodInfo methodInfo = methodInfoMap.get(rpcRequest.getMethodName());
         if (methodInfo == null) {
-            throw new HttpStatusException(METHOD_NOT_FOUND, "method not found:" + rpcRequest.getKey());
+            throw new HttpStatusException(METHOD_NOT_ALLOWED, "method not found:" + rpcRequest.getKey());
         }
         Object result = methodInfo.getMethod().invoke(serviceInstance,
                 convertParameter(methodInfo.getMethod(), rpcRequest));

@@ -15,6 +15,7 @@
         <module>acuprpc-protocol-thrift</module>
         <module>acuprpc-spring-boot-starter-actuator</module>
         <module>acuprpc-spring-boot-starter-gateway</module>
+        <module>acuprpc-protocol-http</module>
     </modules>
     <properties>
         <java.version>1.8</java.version>
@@ -86,6 +87,16 @@
                 <groupId>commons-pool</groupId>
                 <artifactId>commons-pool</artifactId>
                 <version>1.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

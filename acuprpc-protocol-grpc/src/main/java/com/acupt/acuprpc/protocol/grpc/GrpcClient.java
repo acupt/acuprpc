@@ -66,9 +66,7 @@ public class GrpcClient extends RpcClient implements RpcCode {
             ((ManagedChannel) old.getChannel()).shutdown()
                     .awaitTermination(shutdownTimeout, TimeUnit.SECONDS);
         }
-        NodeInfo oldNode = getNodeInfo();
-        setNodeInfo(nodeInfo);
-        return oldNode;
+        return setNodeInfo(nodeInfo);
     }
 
     @Override
