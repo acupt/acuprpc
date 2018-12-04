@@ -4,9 +4,9 @@ import com.acupt.acuprpc.core.NodeInfo;
 import com.acupt.acuprpc.core.RpcRequest;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @author liujie
@@ -19,6 +19,7 @@ public abstract class RpcClient {
     private int timeout = 5;
 
     public RpcClient(NodeInfo nodeInfo) {
+        Objects.requireNonNull(nodeInfo);
         this.nodeInfo = nodeInfo;
     }
 
@@ -35,15 +36,15 @@ public abstract class RpcClient {
     /**
      * 关闭连接
      */
-    public abstract void shutdownRpc();
+    protected abstract void shutdownRpc();
 
-    @PreDestroy
     public void shutdown() {
-        log.info("shutting down {}", this);
         shutdownRpc();
+        log.info("shutdown {} {}", getClass().getSimpleName(), nodeInfo);
     }
 
     public NodeInfo reconnect(NodeInfo nodeInfo) {
+        Objects.requireNonNull(nodeInfo);
         return reconnectRpc(nodeInfo);
     }
 
@@ -62,6 +63,7 @@ public abstract class RpcClient {
     }
 
     protected NodeInfo setNodeInfo(NodeInfo nodeInfo) {
+        Objects.requireNonNull(nodeInfo);
         NodeInfo old = this.nodeInfo;
         this.nodeInfo = nodeInfo;
         return old;

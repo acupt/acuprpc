@@ -11,10 +11,15 @@ import com.netflix.discovery.shared.Application;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author liujie
@@ -22,29 +27,25 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class RpcClientManager {
 
+    private static final long RELOOKUP_PERIOD = 30000;
     private RpcInstance rpcInstance;
 
     private Map<RpcServiceInfo, RpcClient> rpcClientMap = new ConcurrentHashMap<>();
 
     private Random random = new Random();
 
+    private ScheduledExecutorService relookupService = Executors.newSingleThreadScheduledExecutor();
+
     public RpcClientManager(RpcInstance rpcInstance) {
         this.rpcInstance = rpcInstance;
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e) {
-                    log.error("rpc relookup sleep error " + e.getMessage(), e);
-                }
-                try {
-                    relookup();
-                    log.info("rpc relookup finish");
-                } catch (Exception e) {
-                    log.error("rpc relookup error " + e.getMessage(), e);
-                }
+        relookupService.scheduleAtFixedRate(() -> {
+            try {
+                relookup();
+                log.info("rpc relookup finish");
+            } catch (Exception e) {
+                log.error("rpc relookup error " + e.getMessage(), e);
             }
-        }).start();
+        }, RELOOKUP_PERIOD, RELOOKUP_PERIOD, TimeUnit.MILLISECONDS);
     }
 
     public RpcClient lookup(RpcServiceInfo rpcServiceInfo) {
@@ -53,6 +54,21 @@ public class RpcClientManager {
                 return rpcInstance.newRpcClient(selectNode(rpcServiceInfo));
             } catch (RpcNotFoundException e) {
                 throw new RpcException(e);
+            }
+        });
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        if (relookupService != null) {
+            relookupService.shutdown();
+        }
+        rpcClientMap.forEach((k, v) -> {
+            try {
+                v.shutdown();
+            } catch (Exception e) {
+                log.error(String.join(" ", "shutdown error",
+                        k.toString(), v.getNodeInfo().toString(), e.getMessage()), e);
             }
         });
     }
@@ -66,21 +82,33 @@ public class RpcClientManager {
                     log.info("reconnet {} {} -> {}", serviceInfo, oldNodeInfo, nodeInfo);
                 }
             } catch (RpcNotFoundException e) {
-                e.printStackTrace();
+                log.error("relookup " + e.getMessage(), e);
             }
         });
     }
 
-    public NodeInfo selectNode(RpcServiceInfo serviceInfo) throws RpcNotFoundException {
+    private NodeInfo selectNode(RpcServiceInfo serviceInfo) throws RpcNotFoundException {
+        return selectNode(serviceInfo, null);
+    }
+
+    NodeInfo selectNode(RpcServiceInfo serviceInfo, NodeInfo exclude) throws RpcNotFoundException {
         Application application = rpcInstance.getEurekaClient().getApplication(serviceInfo.getAppName());
         if (application == null) {
             throw new RpcNotFoundException(String.format("service[%s] not found", serviceInfo.getAppName()));
         }
-        List<InstanceInfo> list = application.getInstances();
+        List<NodeInfo> list = application.getInstances().stream()
+                .map(this::convertInstanceInfo)
+                .collect(Collectors.toList());
+        if (exclude != null) {
+            list.remove(exclude);
+        }
         if (CollectionUtils.isEmpty(list)) {
             throw new RpcNotFoundException(String.format("service[%s] found no instance", serviceInfo.getAppName()));
         }
-        InstanceInfo instanceInfo = list.get(random.nextInt(list.size()));
+        return list.get(random.nextInt(list.size()));
+    }
+
+    private NodeInfo convertInstanceInfo(InstanceInfo instanceInfo) {
         return new NodeInfo(instanceInfo.getIPAddr(), instanceInfo.getPort());
     }
 }

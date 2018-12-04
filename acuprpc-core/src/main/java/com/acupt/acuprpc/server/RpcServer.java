@@ -3,7 +3,6 @@ package com.acupt.acuprpc.server;
 import com.acupt.acuprpc.core.*;
 import com.acupt.acuprpc.server.filter.RpcFilter;
 import com.acupt.acuprpc.server.filter.RpcFilterChain;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
@@ -17,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author liujie
  */
-@Data
 @Slf4j
 public abstract class RpcServer implements RpcCode {
 
@@ -37,7 +35,7 @@ public abstract class RpcServer implements RpcCode {
 
     @PostConstruct
     public void start() {
-        log.info(getClass().getSimpleName() + " starting");
+        log.info("starting {}", getClass().getSimpleName());
         rpcInstance.start();
         startRpc();
     }
@@ -46,12 +44,12 @@ public abstract class RpcServer implements RpcCode {
     public void shutdown() {
         rpcInstance.shutdown();
         shutdownRpc();
-        log.info(getClass().getSimpleName() + " shutdown");
+        log.info("shutdown {}", getClass().getSimpleName());
     }
 
     public void started() {
         rpcInstance.started();
-        log.info(getClass().getSimpleName() + " started");
+        log.info("started {}", getClass().getSimpleName());
     }
 
     public RpcResponse execute(RpcRequest rpcRequest) {
@@ -81,5 +79,9 @@ public abstract class RpcServer implements RpcCode {
     public <T extends RpcFilter> T addFilter(T filter) {
         filters.add(filter);
         return filter;
+    }
+
+    public RpcInstance getRpcInstance() {
+        return rpcInstance;
     }
 }

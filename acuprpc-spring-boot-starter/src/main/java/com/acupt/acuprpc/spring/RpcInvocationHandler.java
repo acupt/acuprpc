@@ -61,7 +61,7 @@ public class RpcInvocationHandler implements InvocationHandler, RpcCode {
                         i, n, rpcRequest.getKey(), client.getNodeInfo(), e.getClass().getName(), e.getMessage(), rediscover);
                 if (rediscover) {
                     try {
-                        NodeInfo nodeInfo = rpcClientManager.selectNode(rpcServiceInfo);
+                        NodeInfo nodeInfo = rpcClientManager.selectNode(rpcServiceInfo, client.getNodeInfo());
                         client.reconnect(nodeInfo);
                         continue;
                     } catch (RpcNotFoundException e1) {

@@ -3,6 +3,7 @@ package com.acupt.acuprpc.protocol.thrift;
 import com.acupt.acuprpc.core.RpcInstance;
 import com.acupt.acuprpc.exception.RpcException;
 import com.acupt.acuprpc.server.RpcServer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -15,6 +16,7 @@ import java.util.concurrent.Executors;
 /**
  * @author liujie
  */
+@Slf4j
 public class ThriftServer extends RpcServer {
 
     private static final int nThreads = 100;
@@ -41,7 +43,7 @@ public class ThriftServer extends RpcServer {
             tArgs.executorService(Executors.newFixedThreadPool(nThreads));
             server = new TThreadPoolServer(tArgs);
             server.serve();//阻塞
-        }).start();
+        }, "thrift-server-serve").start();
     }
 
     @Override
