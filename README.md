@@ -2,12 +2,27 @@
 + 服务注册/发现(基于eureka)
 + 远程服务调用
   + 支持grpc
-  + 支持thrift（随便写写，不太完善）
-  + 支持自扩展
+  + 支持thrift
+  + 支持http（基于HttpServer）
+  + 支持扩展其它调用方式
 + 调用异常/下线节点自动重试
 + 自定义request filter
 + 服务监控和管理（acuprpc-spring-boot-starter-actuator，基于filter实现）
 + 网关支持
+
+项目模块
+
+```
+- acuprpc
+    - acuprpc-core                          服务提供者(server) / 服务调用者(client)
+    - acuprpc-protocol                      远程调用具体实现，使用时选一种即可
+        - acuprpc-protocol-grpc             基于gRPC的远程调用
+        - acuprpc-protocol-http             基于http的远程调用，使用Java内置HttpServer实现
+        - acuprpc-protocol-thrift           基于thrift的远程调用
+    - acuprpc-spring-boot-starter           启动模块，完成server端的服务管理和client端的动态代理等
+    - acuprpc-spring-boot-starter-actuator  (扩展)服务管理
+    - acuprpc-spring-boot-starter-gateway   (扩展)网关
+```
 
 ## 快速开始
 
